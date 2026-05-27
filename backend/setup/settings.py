@@ -31,12 +31,28 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    # O Unfold e as extensões dele vêm PRIMEIRO de tudo:
+    "unfold",  
+    "unfold.contrib.filters",  
+    "unfold.contrib.forms",  
+    "unfold.contrib.inlines",  
+    "unfold.contrib.import_export",  
+    "unfold.contrib.guardian",  
+    "unfold.contrib.simple_history",  
+    "unfold.contrib.location_field",  
+    "unfold.contrib.constance",  
+
+    # Apps padrão do Django:
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+
+    # REST Framework:
+    "rest_framework",
+    "django_filters",
 ]
 
 MIDDLEWARE = [
