@@ -10,7 +10,8 @@ O repositório é dividido em duas aplicações totalmente independentes que se 
 
 ```text
 E-COMMERCE_THIAGO/
-├── backend/           # API REST em Python & Django + Banco de Dados
+├── docker-compose.yml # Sobe o banco de dados PostgreSQL via Docker
+├── backend/           # API REST em Python & Django
 └── frontend/          # Vitrine do Cliente em Astro + TypeScript
 ```
 
@@ -68,10 +69,13 @@ Responsável por centralizar as regras de negócios, persistência no banco de d
 - **Django REST Framework (DRF):** Ferramenta utilizada para transformar o Django em uma fábrica de dados, servindo e recebendo dados estruturados em JSON.
 - **Django Unfold:** Tema moderno baseado em Tailwind CSS utilizado para remodelar e profissionalizar o visual do **Django Admin**, gerenciando operadores e o estoque de produtos de forma visual.
 - **Django CORS Headers:** Biblioteca de segurança obrigatória para gerenciar o compartilhamento de recursos de origens cruzadas, liberando o acesso seguro da API para o servidor do Astro.
+- **PostgreSQL:** Banco de dados relacional utilizado em produção, substituindo o SQLite padrão do Django.
+- **python-decouple:** Biblioteca que lê variáveis de ambiente a partir de um arquivo `.env`, mantendo credenciais e configurações sensíveis fora do código-fonte (prática padrão de mercado).
+- **Docker:** O banco de dados PostgreSQL roda em um container Docker, garantindo ambiente idêntico em qualquer máquina sem instalação manual.
 
 ### ⚙️ Instalação do Back-End
 
-> Pré-requisito: ter o **Python 3.12+** instalado.
+> Pré-requisitos: **Python 3.12+** e **Docker** instalados.
 
 ```bash
 # 1. Entrar na pasta do backend
@@ -84,21 +88,32 @@ python -m venv .venv
 source .venv/bin/activate  # Linux/macOS
 # .venv\Scripts\activate   # Windows
 
-# 4. Instalar todas as dependências
-pip install django==6.0.5 djangorestframework==3.17.1 django-unfold==0.93.0 django-cors-headers==4.9.0
+# 4. Instalar todas as dependências a partir do requirements.txt
+pip install -r requirements.txt
 
-# 5. Criar o projeto Django (caso esteja iniciando do zero)
-django-admin startproject setup .
+# 5. Configurar as variáveis de ambiente
+# Copie o arquivo de exemplo e preencha com suas credenciais reais
+cp .env.example .env
+# Edite o arquivo .env com seu editor preferido
 
-# 6. Aplicar as migrações do banco de dados
+# 6. Subir o banco de dados via Docker (na raiz do projeto)
+cd ..
+docker compose up -d
+cd backend
+
+# 7. Aplicar as migrações do banco de dados
 python manage.py migrate
 
-# 7. Criar um superusuário para acessar o Admin
+# 8. Criar um superusuário para acessar o Admin
 python manage.py createsuperuser
 
-# 8. Rodar o servidor de desenvolvimento
+# 9. Rodar o servidor de desenvolvimento
 python manage.py runserver
 ```
+
+> **Variáveis de ambiente:** O arquivo `.env` nunca deve ser commitado no git. Ele já está listado no `.gitignore`. Use o `.env.example` como referência para saber quais variáveis precisam ser configuradas.
+
+> **Docker:** O `docker-compose.yml` lê as credenciais diretamente do `backend/.env` via interpolação `${VARIAVEL}` — nenhuma senha fica exposta no arquivo.
 
 _Acessível localmente em: `http://localhost:8000`_  
 _Painel Admin em: `http://localhost:8000/admin`_
@@ -107,9 +122,16 @@ _Painel Admin em: `http://localhost:8000/admin`_
 
 ## 🚀 Rodando o Projeto Completo
 
-Para rodar o projeto completo, abra dois terminais:
+Para rodar o projeto completo, abra três terminais:
 
-**Terminal 1 — Back-End:**
+**Terminal 1 — Banco de Dados (Docker):**
+
+```bash
+# Na raiz do projeto
+docker compose up -d
+```
+
+**Terminal 2 — Back-End:**
 
 ```bash
 cd backend
@@ -117,7 +139,7 @@ source .venv/bin/activate
 python manage.py runserver
 ```
 
-**Terminal 2 — Front-End:**
+**Terminal 3 — Front-End:**
 
 ```bash
 cd frontend
